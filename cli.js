@@ -6,7 +6,6 @@ import { render, preview, listFormats, listTemplates, fromTemplate, checkRendere
 import { ProjectAnalyzer } from './lib/projectAnalyzer.js';
 import { Copywriter } from './lib/copywriter.js';
 import { ImageBank } from './lib/imageBank.js';
-import { ImageVariations } from './lib/imageVariations.js';
 import { MarketingRules } from './lib/marketingRules.js';
 import path from 'path';
 import fs from 'fs/promises';
@@ -496,6 +495,7 @@ async function main() {
         if (filter) console.log(`   Filtro: ${filter}`);
 
         try {
+          const { ImageVariations } = await import('./lib/imageVariations.js');
           const result = await ImageVariations.applyAdjustments(imagePath, { brightness, contrast, filter }, outputPath);
           console.log(`✅ Variación guardada: ${result}`);
           console.log(`   Costo: $0 (sin Replicate)`);
