@@ -15,9 +15,6 @@ Para cualquier tarea de diseño, leer primero:
 | projectAnalyzer | Lee brand.json, tailwind.config, CSS vars; extrae HEX reales |
 | SKILL.md | Flujo 0→7 completo, es el guión que sigue Cowork |
 
-> **Nota:** HANDOFF.md decía que ComfyUI estaba "abandonado" (error "Prompt has no outputs").
-> Ese bug fue resuelto en sesión 2026-06-04. El cliente actual en `lib/comfyuiClient.js` funciona.
-
 ---
 
 ## Entradas principales
