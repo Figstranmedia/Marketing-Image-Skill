@@ -1,5 +1,11 @@
 # Marketing Image Skill
 
+<div align="center">
+  <img src="assets/github-banner.png" alt="Marketing Image Skill — FLUX + Design Engine + Captions" width="100%">
+</div>
+
+---
+
 Skill de generación de imágenes de marketing para proyectos reales. Lee la identidad visual del proyecto (colores, tipografías, tono), genera imágenes de fondo con FLUX via Replicate, compone los diseños finales localmente con el design engine y genera captions listos para publicar.
 
 Funciona desde cualquier carpeta de proyecto. Los resultados se guardan en `marketing-assets/` dentro del propio proyecto.
