@@ -1,0 +1,23 @@
+{
+  "name": "marketing-image-skill",
+  "version": "0.1.0",
+  "description": "AI-powered marketing image generation skill for Rafael's projects",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.js",
+    "analyze": "node cli.js analyze",
+    "generate": "node cli.js generate",
+    "test-flux": "node cli.js test-flux"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.0.3",
+    "glob": "^10.0.0",
+    "js-yaml": "^4.1.0",
+    "puppeteer": "^22.15.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  }
+}
