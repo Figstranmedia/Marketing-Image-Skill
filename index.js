@@ -85,12 +85,17 @@ export class MarketingImageSkill {
     }
 
     // Generar prompts inteligentes
-    const prompts = this.promptGen.generateCarouselPrompts(
+    const rawPrompts = this.promptGen.generateCarouselPrompts(
       brandData,
       topic,
       slides,
       marketingRules
     );
+
+    const [imgWidth, imgHeight] = (marketingRules.aspectRatio || '1080x1350')
+      .split('x')
+      .map(Number);
+    const prompts = rawPrompts.map(p => ({ ...p, width: imgWidth, height: imgHeight }));
 
     if (dryRun) {
       console.log('\n📋 Preview de prompts (dry-run):');

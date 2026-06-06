@@ -7,6 +7,7 @@ import { ProjectAnalyzer } from './lib/projectAnalyzer.js';
 import { Copywriter } from './lib/copywriter.js';
 import { ImageBank } from './lib/imageBank.js';
 import { ImageVariations } from './lib/imageVariations.js';
+import { MarketingRules } from './lib/marketingRules.js';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -47,7 +48,7 @@ async function main() {
         projectPath = args[1];
         if (args[2]) format = args[2];
         if (args[3]) topic = args[3];
-      } else if (['instagram-carousel', 'linkedin-post', 'twitter-post', 'instagram-story', 'facebook-ad'].includes(args[1])) {
+      } else if (new MarketingRules().getAllFormats().includes(args[1])) {
         // Si es un formato conocido, usar path por defecto
         format = args[1];
         if (args[2]) topic = args[2];
@@ -200,6 +201,47 @@ async function main() {
           });
         }
         break;
+
+      case 'list-bank': {
+        // node cli.js list-bank [project_path] [--topic "tema"] [--tags "tag1,tag2"]
+        const bankProjectPath = args[1] && !args[1].startsWith('--') ? args[1] : projectPath;
+        const topicIdx = args.indexOf('--topic');
+        const bankTopic = topicIdx >= 0 ? args[topicIdx + 1] : '';
+        const bankTagsIdx = args.indexOf('--tags');
+        const bankTags = bankTagsIdx >= 0 ? args[bankTagsIdx + 1].split(',').map(t => t.trim()) : [];
+
+        const bank = new ImageBank(bankProjectPath);
+        const stats = await bank.getStats();
+
+        if (stats.totalImages === 0) {
+          console.log('📭 Banco vacío — no hay imágenes en Graficas/ai-generadas/');
+          console.log(`   Ruta buscada: ${bankProjectPath}/Graficas/ai-generadas/`);
+          break;
+        }
+
+        console.log(`\n🖼️  Banco de imágenes: ${stats.totalImages} imágenes`);
+        if (stats.lastUpdate) console.log(`   Última actualización: ${stats.lastUpdate.split('T')[0]}`);
+        if (Object.keys(stats.temas).length > 0) {
+          const temasStr = Object.entries(stats.temas).map(([t, n]) => `${t} (${n})`).join(', ');
+          console.log(`   Temas: ${temasStr}`);
+        }
+        if (Object.keys(stats.tags).length > 0) {
+          const tagsStr = Object.entries(stats.tags).map(([t, n]) => `${t} (${n})`).join(', ');
+          console.log(`   Tags: ${tagsStr}`);
+        }
+
+        if (bankTopic || bankTags.length > 0) {
+          const matches = await bank.search(bankTopic, bankTags);
+          console.log(`\n   Compatibles con "${bankTopic || bankTags.join(', ')}": ${matches.length}`);
+          matches.slice(0, 10).forEach(img => {
+            const tags = img.tags?.join(', ') || 'sin tags';
+            const fecha = img.fecha?.split('T')[0] || '';
+            console.log(`   ✓ ${img.file}  [${tags}]  ${fecha}`);
+          });
+          if (matches.length > 10) console.log(`   ... y ${matches.length - 10} más`);
+        }
+        break;
+      }
 
       case 'design': {
         // node cli.js design [folder] [--template nombre] [--format formato]

@@ -3,7 +3,7 @@
 ## Conocimiento experto de diseño
 Para cualquier tarea de diseño, leer primero:
 - `lib/designEngine/DESIGN_SKILL.md` — reglas de templates, tipografía, color, composición y coherencia de carrusel
-- `lib/designEngine/templates/index.js` — catálogo de los 10 templates disponibles
+- `lib/designEngine/templates/index.js` — catálogo de los 11 templates disponibles
 - `lib/designEngine/formats.js` — dimensiones, tipografía mínima y safe areas por plataforma
 
 ## Estado actual (2026-06-04)

@@ -375,10 +375,9 @@ Mostrar resumen:
    ¿Continuamos?"
 
 Si sí:
-  REPLICATE_API_TOKEN="r8_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   node cli.js create "[TEMA]" --format [FORMAT] --template [TEMPLATE]
 
-Esperar resultado.
+Esperar resultado. (El token se lee automáticamente del .env)
 ```
 
 **PASO 5: Mostrar resultado**
@@ -395,11 +394,11 @@ slide-03.png
 
 ### Variables del comando:
 ```
-REPLICATE_API_TOKEN = r8_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (configurado)
-[TEMA] = lo que extraíste en PASO 1
-[FORMAT] = lo que elegimos en PASO 2 (default: instagram-carousel)
+[TEMA]     = lo que extraíste en PASO 1
+[FORMAT]   = lo que elegimos en PASO 2 (default: instagram-carousel)
 [TEMPLATE] = lo que elegimos en PASO 3 (default: full-bleed-image)
 ```
+El token de Replicate se lee automáticamente del archivo `.env` — no se pasa inline.
 
 ### Casos especiales:
 
