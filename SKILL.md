@@ -68,16 +68,26 @@ ls node_modules/.bin/puppeteer 2>/dev/null && echo "deps:ok" || npm install --ig
 
 Si falla → reportar error específico, no pedirle al usuario que lo haga manualmente.
 
-### 0.3 Instalar Chrome para Puppeteer (solo primera vez)
+### 0.3 Instalar Chrome (solo primera vez)
 
 ```bash
-ls $SKILL_HOME/node_modules/puppeteer/.local-chromium 2>/dev/null || \
-ls ~/.cache/puppeteer/chrome 2>/dev/null || \
+# Verificar si ya hay un Chrome disponible
 ls /Applications/Google\ Chrome.app 2>/dev/null && echo "chrome:ok" || \
-(cd $SKILL_HOME && npx puppeteer browsers install chrome 2>&1 | tail -2)
+ls ~/.cache/puppeteer/chrome 2>/dev/null && echo "chrome:ok" || \
+ls ~/.cache/ms-playwright/chromium-* 2>/dev/null && echo "chrome:ok (playwright)" || \
+(
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
+    # ARM: Puppeteer descarga x86-64 y falla — usar Playwright
+    echo "ARM detectado ($ARCH) — instalando Chromium via Playwright..."
+    cd $SKILL_HOME && npx playwright install chromium 2>&1 | tail -3
+  else
+    cd $SKILL_HOME && npx puppeteer browsers install chrome 2>&1 | tail -2
+  fi
+)
 ```
 
-Chrome del sistema (macOS) se detecta automáticamente — no necesita descarga si ya tienes Chrome instalado.
+El renderer detecta automáticamente Chrome del sistema, Puppeteer bundled o Playwright Chromium — en ese orden de prioridad.
 
 ### 0.4 Tokens de API (única interacción requerida con el usuario)
 
