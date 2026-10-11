@@ -214,16 +214,16 @@ async function main() {
         const bankTagsIdx = args.indexOf('--tags');
         const bankTags = bankTagsIdx >= 0 ? args[bankTagsIdx + 1].split(',').map(t => t.trim()) : [];
 
-        const bank = new ImageBank(bankProjectPath);
+        const bank = await ImageBank.forProject(bankProjectPath);
         const stats = await bank.getStats();
 
         if (stats.totalImages === 0) {
-          console.log('📭 Banco vacío — no hay imágenes en Graficas/ai-generadas/');
-          console.log(`   Ruta buscada: ${bankProjectPath}/Graficas/ai-generadas/`);
+          console.log(`📭 Banco vacío — no hay imágenes en ${path.relative(bankProjectPath, bank.bankDir)}/`);
+          console.log(`   Ruta buscada: ${bank.bankDir}/`);
           break;
         }
 
-        console.log(`\n🖼️  Banco de imágenes: ${stats.totalImages} imágenes`);
+        console.log(`\n🖼️  Banco de imágenes: ${stats.totalImages} imágenes en ${path.relative(bankProjectPath, bank.bankDir)}/`);
         if (stats.lastUpdate) console.log(`   Última actualización: ${stats.lastUpdate.split('T')[0]}`);
         if (Object.keys(stats.temas).length > 0) {
           const temasStr = Object.entries(stats.temas).map(([t, n]) => `${t} (${n})`).join(', ');
@@ -554,7 +554,7 @@ async function main() {
 
         // 2. Buscar en banco o generar FLUX
         let genResult;
-        const bank = new ImageBank(projectPath);
+        const bank = await ImageBank.forProject(projectPath);
 
         if (useReuse) {
           console.log(`🔍 Buscando imágenes reutilizables en el banco...`);

@@ -625,7 +625,15 @@ Si hay error 429: el script reintenta automáticamente.
 
 ### 4B. Registrar imágenes en el banco (SIEMPRE al generar)
 
-Cada imagen generada con Replicate se registra en `Graficas/ai-generadas/manifest.json`:
+La forma directa es pasar `--bank`: el script descarga cada imagen al banco y la registra en
+su `manifest.json` en la misma llamada (las URLs de Replicate caducan).
+
+```bash
+cd $SKILL_HOME && node scripts/generate_flux_urls.js '[{"type":"hero","prompt":"..."}]' \
+  --bank [project_path] --tema cosmos --tags "cosmos,fractal"
+```
+
+Si se generó sin `--bank`, registrar a mano. Cada imagen va en el `manifest.json` del banco:
 
 ```bash
 BANK_DIR=[project_path]/Graficas/ai-generadas
@@ -659,6 +667,38 @@ Actualizar `manifest.json` con cada imagen nueva:
 **Tags recomendados para este proyecto:** `geometria-sagrada`, `cosmos`, `angel`, `fractal`, `luz`, `espiritual`, `abstracto`, `naturaleza`, `oscuro`, `dorado`
 
 Registrar siempre aunque sea para uso inmediato — construye el banco para reutilización futura.
+
+### Banco único y cliente único (compartido con editor-pro-max)
+
+Un proyecto tiene **un solo banco de imágenes generadas** y **un solo cliente de Replicate**:
+
+- **Banco:** `Graficas/ai-generadas/` (con su `manifest.json`), gestionado por `lib/imageBank.js`.
+  El `brand.json` del proyecto puede declararlo en `assets.generados`:
+  ```json
+  "assets": { "generados": "Graficas/ai-generadas/" }
+  ```
+  También vale un array, donde la ruta convive con los registros de imágenes que anota
+  editor-pro-max: `["Graficas/ai-generadas/", {"file": "...", "fecha": "..."}]`. Sin
+  declaración se usa `Graficas/ai-generadas/`. `node cli.js list-bank [project_path]` lee esa ruta.
+- **Cliente:** `scripts/generate_flux_urls.js`, que delega en `FluxClient` (`lib/fluxClient.js`).
+  El token se lee de **un solo** `.env` (`REPLICATE_API_TOKEN`, en `$SKILL_HOME/.env`).
+
+**El tipo 2 de editor-pro-max (`editor-pro-max-ai-video`, explainers) usa este mismo banco y
+este mismo script.** No llama a Replicate por su cuenta ni lee otro `.env`:
+
+```bash
+# 1. Reuso: ¿ya hay imágenes del tema?
+node $SKILL_HOME/cli.js list-bank [project_path] --topic "[tema]"
+
+# 2. Generar solo lo que falte — 9:16 para reels — y registrarlo en el banco
+cd $SKILL_HOME && node scripts/generate_flux_urls.js '[
+  {"type":"escena-1","prompt":"...","width":1080,"height":1920}
+]' --bank [project_path] --tema "[tema]"
+```
+
+Las imágenes quedan en el banco con su ruta (`bankPath` en el JSON de salida); Remotion las
+toma de ahí (copiándolas a `videos/public/assets/`). Así un fondo generado para un explainer
+sirve después para un carrusel, y al revés.
 
 ### 4C. Estrategia de banco de imágenes (10–15 por tanda)
 
