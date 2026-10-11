@@ -90,6 +90,22 @@ async function main() {
         );
         console.log('Sources:', style.sources);
         console.log('Confidence:', style.confidence);
+
+        if (args.includes('--write-brand')) {
+          const { writeBrandJson } = await import('./lib/brandWriter.js');
+          const fullAnalysis = await new ProjectAnalyzer(projectPath).analyze();
+          const res = await writeBrandJson(projectPath, fullAnalysis, { force: args.includes('--force') });
+          if (!res.written) {
+            console.log(`\n⚠️  ${res.reason}: ${res.path}`);
+          } else {
+            const c = res.brand.marca.colores;
+            console.log(`\n✅ brand.json escrito: ${res.path}`);
+            console.log(`   Medidos: ${res.scan.measured.length} PNG — dominantes: ${res.scan.dominant.join(' ') || 'ninguno'}`);
+            console.log(`   fondo ${c.fondo} · tinta ${c.tinta} · acento ${c.acento || '—'} · acento_claro ${c.acento_claro || '—'}`);
+            if (res.brand.marca.logo) console.log(`   Logo: ${res.brand.marca.logo}${res.brand.marca.logo_vector ? ` · vector: ${res.brand.marca.logo_vector}` : ''}`);
+            console.log('   Revísalo y confírmalo antes de producir (el fondo no se mide: se asume blanco).');
+          }
+        }
         break;
 
       case 'suggest':
@@ -721,8 +737,13 @@ COMANDOS PRINCIPALES:
       node cli.js create "tour 2026" --format instagram-story
       node cli.js create "anuncio de evento" --template announcement --scale 2
 
-  analyze [project-path]
-    Mostrar análisis de marca (colores, tipografía, tono)
+  analyze [project-path] [--write-brand] [--force]
+    Mostrar análisis de marca (colores, tipografía, tono, fuentes, confianza)
+    --write-brand: escanear imágenes/logos y escribir brand.json (schema editor-pro-max)
+    --force:       sobrescribir un brand.json existente (conserva estilo y reglas)
+
+  list-bank [project-path] [--topic "tema"] [--tags "a,b"]
+    Banco de imágenes (brand.json → assets.generados, o Graficas/ai-generadas/)
 
   generate [format] "tema" [--dry-run] [--local] [--json]
     Generar solo las imágenes FLUX (sin diseñar)

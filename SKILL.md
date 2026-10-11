@@ -496,6 +496,24 @@ Si existe, mostrar resumen:
 
 ### 2F. Escanear imágenes del proyecto
 
+Implementado en `lib/imageScanner.js`. Recorre la carpeta del producto (salta
+`node_modules`, `marketing-assets`, el banco y builds), clasifica logos e imágenes, y **mide la
+paleta de los logos PNG por píxeles** — ignora alfa < 200 y el casi-blanco, agrupa los tonos
+cercanos y devuelve los hex dominantes. Si no hay logos, mide el resto de PNG. Un SVG que solo
+envuelve un raster (`<image>`) no cuenta como `logo_vector`. JPG/WebP se listan, no se miden.
+
+Si el proyecto no tiene `brand.json`, crearlo desde el escaneo:
+```bash
+node cli.js analyze [project_path] --write-brand          # no toca un brand.json existente
+node cli.js analyze [project_path] --write-brand --force  # lo reescribe; conserva estilo, formato y reglas_aprendidas
+```
+Escribe el schema de editor-pro-max (`marca.colores` = fondo/tinta/acento/acento_claro,
+`marca.tipografia`, `marca.tono`, `logo`, `logo_vector`, `assets.imagenes`,
+`assets.generados`). **El fondo no se mide** (el blanco se excluye): se asume `#FFFFFF`.
+Mostrar el resultado al usuario y pedir visto bueno antes de producir.
+
+Clasificación manual de referencia:
+
 ```bash
 find [project_path] -maxdepth 5 \
   \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \
