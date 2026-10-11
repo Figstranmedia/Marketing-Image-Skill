@@ -79,12 +79,17 @@ async function main() {
         console.log('📊 Analizando proyecto...\n');
         const style = await skill.analyzeProjectStyle();
         console.log('Color Palette:', style.colors);
+        console.log('Fonts:', style.fonts);
         console.log('Tone:', style.tone);
         console.log('Aesthetic:', style.aesthetic);
+        if (style.estilo) console.log('Estilo:', style.estilo);
+        if (style.reglasAprendidas?.length) console.log('Reglas aprendidas:', style.reglasAprendidas);
         console.log(
           'Suggested Image Type:',
           style.suggestedImageType
         );
+        console.log('Sources:', style.sources);
+        console.log('Confidence:', style.confidence);
         break;
 
       case 'suggest':
@@ -278,8 +283,11 @@ async function main() {
           console.log(`⚠️  Sin manifest.json — usando 3 slides por defecto (hero/body/cta)`);
         }
 
-        const analyzer = new ProjectAnalyzer(projectPath);
+        // La marca sale de la carpeta de salida o de su ancestro más cercano con brand.json
+        const brandRoot = await ProjectAnalyzer.findBrandRoot(outputFolder, projectPath);
+        const analyzer = new ProjectAnalyzer(brandRoot);
         const brand = await analyzer.analyze();
+        console.log(`   Marca: ${brand.sources.join(', ') || 'sin archivos de marca'} (confianza ${brand.confidence}) — ${brandRoot}`);
         const slideFormat = formatArg || manifest?.format || 'instagram-carousel';
         const templateName = templateArg || 'full-bleed-image';
 
@@ -415,7 +423,7 @@ async function main() {
           process.exit(1);
         }
 
-        const analyzer2 = new ProjectAnalyzer(projectPath);
+        const analyzer2 = new ProjectAnalyzer(await ProjectAnalyzer.findBrandRoot(outputFolder2, projectPath));
         const brand2     = await analyzer2.analyze();
         const format2    = manifest2?.format || 'instagram-carousel';
         const template2  = tplArg2 || 'full-bleed-image';

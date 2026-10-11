@@ -88,12 +88,45 @@ Con el Brand Profile listo, el skill tiene:
 
 | Elemento | Uso posterior |
 |----------|--------------|
-| `palette.primary` | Fondo principal, base de gradientes |
-| `palette.secondary` | Extremo de gradiente, overlays secundarios |
+| `palette.primary` | Superficie **oscura**: fondo de los templates oscuros, base de gradientes y overlays |
+| `palette.secondary` | Segundo color de marca (acento claro): items de lista, detalles |
 | `palette.accent` | Chips, líneas, botones CTA, SVG burst |
 | `typography.heading` | Títulos — `role: "title"` |
 | `typography.body` | Subtítulos, cuerpo — `role: "subtitle|body"` |
 | `tone` | Decisión de template (oscuro/claro/minimal) |
+
+### Criterio de color por rol (brand.json de editor-pro-max)
+
+Los templates no son neutros: **10 de 11 asumen que `primary` es una superficie oscura** y
+pintan encima texto blanco fijo (`editorial-dark`, `data-visual`, `presentation-slide`,
+`list-card`, `cta-bold`, `announcement`, `quote-card`, `minimal-centered`, `split-layout`,
+`full-bleed-image` en overlays). Solo `editorial-light` usa `primary` como color de **texto**
+sobre un fondo claro. Por eso la paleta se asigna por **rol y luminancia**, no por el nombre
+del campo:
+
+| Campo de la paleta | De dónde sale | Lo usan |
+|---|---|---|
+| `primary` | el más **oscuro** entre `marca.colores.fondo` y `tinta` (si no hay ninguno oscuro, `#0F0F0F`) | fondo de templates oscuros; texto en `editorial-light` |
+| `light` | el más **claro** entre `fondo` y `tinta` (si no, `#F8F6F2`) | fondo de `editorial-light` |
+| `accent` | `acento` tal cual | referencia, prompts |
+| `accentOnDark` | `acento` o `acento_claro`, el primero con contraste ≥ 3:1 sobre `primary`; si ninguno llega, el acento aclarado lo justo | líneas, cifras, chips, botones en templates oscuros |
+| `accentOnLight` | `acento`, oscurecido lo justo para 3:1 sobre `light` | `editorial-light` |
+| `secondary` | `acento_claro` (o el acento aclarado) | items de `list-card` |
+| `primaryDeep` | `primary` teñido 25 % del acento y oscurecido — siempre oscuro | segundo stop de gradientes oscuros, fondo de `split-layout` |
+| `onAccent` / `onAccentLight` | blanco o `#111111`, el de mayor contraste | texto sobre chips y botones de acento |
+
+Consecuencias:
+- **Marca de fondo claro** (marfil `#F7F2EC`, tinta `#1A1A1A`): los templates oscuros usan la
+  tinta como superficie; `editorial-light` usa el marfil de fondo y la tinta como texto.
+- **Marca de fondo vino** (fondo `#5A0F1E`, tinta marfil): los templates oscuros usan el vino;
+  `editorial-light` usa la tinta marfil de fondo y el vino como texto.
+- Un acento oscuro (vino sobre `#1A1A1A`, ~1.7:1) **no se pinta tal cual** sobre la superficie
+  oscura: se usa `acento_claro` si lo hay, o el acento aclarado hasta 3:1.
+- `brand.colors` conserva el mapeo literal (`primary` = tinta, `secondary` = acento_claro,
+  `accent` = acento, `background` = fondo) para quien lo lea fuera de los templates; los
+  templates leen `brand.palette` primero.
+- Marcas en formato plano (`colors` / tokens / tailwind) no traen estos campos: los templates
+  caen a los mismos valores de siempre.
 
 **Derivar template base del tono:**
 - `professional` → `editorial-light`, `split-layout`

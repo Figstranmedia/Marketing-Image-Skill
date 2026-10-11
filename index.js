@@ -163,6 +163,11 @@ export class MarketingImageSkill {
       suggestedImageType: this.promptGen.recommendImageStyle(brand),
       contrast: brand.contrast,
       aesthetic: brand.aesthetic,
+      palette: brand.palette,
+      estilo: brand.estilo ?? null,
+      reglasAprendidas: brand.reglasAprendidas ?? [],
+      sources: brand.sources,
+      confidence: brand.confidence,
     };
   }
 }
