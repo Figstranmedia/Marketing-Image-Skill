@@ -1,6 +1,6 @@
 ---
 name: marketing-image
-description: Genera imágenes de marketing AI para cualquier proyecto. Se activa cuando el usuario quiere crear contenido visual para redes sociales — carruseles, posts, stories, ads — independientemente del stack del proyecto. Lee la identidad visual del proyecto (colores, tipografías, tono), reutiliza imágenes del banco local (Graficas/ai-generadas/) o genera con FLUX via Replicate, y compone los diseños con HTML + headless Chrome. Sin Canva ni Figma. Frases de activación: "haz un carousel sobre X", "crea imágenes de marketing para Y", "genera contenido para redes sociales", "crea un post sobre Z", "genera imágenes para mi marca", "quiero hacer un anuncio de X".
+description: Genera imágenes de marketing AI para cualquier proyecto. Se activa cuando el usuario quiere crear contenido visual para redes sociales — carruseles, posts, stories, ads — independientemente del stack del proyecto. Lee la identidad visual del proyecto (colores, tipografías, tono), reutiliza imágenes del banco único del proyecto (el declarado en brand.json → assets.generados; por defecto Graficas/ai-generadas/) o genera con FLUX via Replicate, y compone los diseños con HTML + headless Chrome. Sin Canva ni Figma. Frases de activación: "haz un carousel sobre X", "crea imágenes de marketing para Y", "genera contenido para redes sociales", "crea un post sobre Z", "genera imágenes para mi marca", "quiero hacer un anuncio de X".
 ---
 
 # Marketing Image Skill — Flujo Completo
@@ -12,7 +12,8 @@ Skill neutro y adaptativo. Funciona desde cualquier proyecto: lee su identidad v
 ## Flujo preferido (producción probada)
 
 ```
-1. Replicate genera fondos una sola vez → se guardan en Graficas/ai-generadas/
+1. Replicate genera fondos una sola vez → se guardan en el banco del proyecto
+   (`brand.json → assets.generados`; si no está declarado, `Graficas/ai-generadas/`)
 2. Design engine HTML + headless Chrome compone los slides
 3. PNGs finales guardados directamente en marketing-assets/ del proyecto
 4. Cambios de texto o layout → re-renderizar sin regenerar imágenes (--reuse)
@@ -682,7 +683,7 @@ Actualizar `manifest.json` con cada imagen nueva:
 }
 ```
 
-**Tags recomendados para este proyecto:** `geometria-sagrada`, `cosmos`, `angel`, `fractal`, `luz`, `espiritual`, `abstracto`, `naturaleza`, `oscuro`, `dorado`
+**Tags:** salen del tema y de la marca de cada proyecto. Ejemplo (Religión del Espíritu): `geometria-sagrada`, `cosmos`, `angel`, `fractal`, `luz`, `espiritual`. Para MUSICVOLUTION serían cosas como `orquesta`, `cuerdas`, `niños`, `aula`, `vino`, `dorado`.
 
 Registrar siempre aunque sea para uso inmediato — construye el banco para reutilización futura.
 
@@ -690,7 +691,10 @@ Registrar siempre aunque sea para uso inmediato — construye el banco para reut
 
 Un proyecto tiene **un solo banco de imágenes generadas** y **un solo cliente de Replicate**:
 
-- **Banco:** `Graficas/ai-generadas/` (con su `manifest.json`), gestionado por `lib/imageBank.js`.
+- **Banco:** la carpeta de `brand.json → assets.generados` (con su `manifest.json`), gestionada
+  por `lib/imageBank.js`. **En los ejemplos de este skill `Graficas/ai-generadas/` es solo el
+  valor por defecto**: si el `brand.json` declara otra ruta (MUSICVOLUTION usa `ai-generadas/`),
+  usa esa en todos los comandos.
   El `brand.json` del proyecto puede declararlo en `assets.generados`:
   ```json
   "assets": { "generados": "Graficas/ai-generadas/" }
@@ -915,11 +919,18 @@ Hashtags: [hashtags]
 
 ## Tipografía mínima por plataforma (legibilidad mobile)
 
+Una lámina de 1080 px se ve en un teléfono de ~390 pt de ancho: cada px del diseño vale ~0,36
+pt en pantalla. El mínimo de texto legible de Apple es 11 pt → **≈ 30 px en el diseño**. Nada
+que el espectador deba leer va por debajo de eso.
+
 | Elemento | Instagram (1080px) | LinkedIn (1200px) | Twitter (1024px) |
 |----------|--------------------|-------------------|------------------|
-| Título   | 64–80px            | 48–60px           | 40–52px          |
-| Subtítulo | 28–36px           | 24–30px           | 20–26px          |
-| Label/chip | 13–16px          | 12–14px           | 12–14px          |
+| Título   | 72–96px            | 56–72px           | 48–60px          |
+| Subtítulo | 40–48px           | 32–40px           | 30–36px          |
+| Label/chip | ≥ 30px           | ≥ 28px            | ≥ 28px           |
+
+Si `brand.json` existe, su tipografía y sus `reglas_aprendidas` mandan sobre esta tabla. En
+video (reels, 9:16) los mínimos son más altos — ver `video-motion-graphics`.
 
 ---
 
